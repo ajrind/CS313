@@ -1,22 +1,27 @@
 <?php require 'dbConnect.php';?>
 
 <?php
-  // insert verification to make sure that they are signed in before they can create a character.  
-  // If not, create page that says "you must be signed in to create a character" with a link to sign_up.php
 
+  $cookieName = "loggedIn";
+  $cookieValue = "NULL";
+  $forwardLocation = "login.php";
 
-  // Forward to Character viewer after dones
+  // If login worked
+  if(isset($_COOKIE[$cookieName]) && $_COOKIE[$cookieName] != "NULL")
+  {
+    // left blank intentionally
+  }
 
+  else
+  {
+    header("Location:$forwardLocation");
+  }
 ?>
-
-
-
-
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Midvale - Account Creation</title>
+  <title>Midvale - Character Creation</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="style.css">
@@ -37,25 +42,27 @@
         </li>
       </ul>
     </nav>
-<div class="container">
-  <div class="jumbotron">
-    <h1 class = "center">Midvale</h1>
-    <h3 class = "center">Account Creation</h3>
-  </div>
+    <div class="container">
+      <div class="jumbotron">
+        <h1 class = "center">Midvale</h1>
+        <h3 class = "center">Character Creation</h3>
+      </div>
   
-  <div>
+    <div>
     <h2> Sign Up and Start Playing </h2>
     <p>Enter the following information to create your account.</p>
     <br />
 
-    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="POST">
+    <form id="mainForm" action="process_character.php" method="GET">
+    
+    <?php //echo htmlspecialchars($_SERVER["PHP_SELF"]);?>
       <table>
         <tr>
           <td class ="bold_right" >
             Character Name:
           </td>
           <td>
-            <input name="first_name"> </input> 
+            <input name="name"> </input> 
           </td>
         </tr> 
         <tr>
@@ -67,16 +74,39 @@
           </td>
           <td>
             <select name="characterClass" id="characterClass">
-             <option value="none"></option>
-             <option value="3">Warrior</option>
-             <option value="1">Traveler</option>
-             <option value="2">Mage</option>
+             <option value="traveler">Traveler</option>
+             <option value="mage">Mage</option>
+             <option value="warrior">Warrior</option>
             </select>
           </td>
         </tr>
         <tr>
           <td> <br /></td>
         </tr>
+        <tr>
+          <td class ="bold_right" >
+            Owner:
+          </td>
+          <td>
+
+            <select name="owner" id="owner">
+            <?php
+             
+              $db = loadDatabase();
+              // get users data from database
+              $stmt = $db->query("SELECT username, user_id FROM users ORDER BY username ASC");
+
+              $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+              // populate options
+              foreach ($results as $row)
+              {
+                echo "  <option value =\"" . $row['user_id'] . "\"> ". $row['username'] . "</option>\n";
+              }
+            ?>
+            </select>
+          </td>
+        </tr> 
         <tr>
           <td></td>
           <td>
@@ -86,6 +116,6 @@
       </table>
     </form>
   </div>
-</div>
+  </div>
 </body>
 </html>

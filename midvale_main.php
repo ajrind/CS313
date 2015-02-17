@@ -1,3 +1,24 @@
+<?php require 'dbConnect.php';?>
+
+<?php
+
+  $cookieName = "loggedIn";
+  $cookieValue = "NULL";
+  $forwardLocation = "login.php";
+
+  // If login worked
+  if(isset($_COOKIE[$cookieName]) && $_COOKIE[$cookieName] != "NULL")
+  {
+    // left blank intentionally
+  }
+
+  else
+  {
+    header("Location:$forwardLocation");
+  }
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -29,8 +50,8 @@
   <div class="center">
       <h2> Play Game </h2>
       <h4> (coming soon) </h4>
-      <h2> Create Account </h2>
-      <h2> Create Character </h2>
+      <h2> <a href="sign_up.php">Create Account </a></h2>
+      <h2> <a href="create_character.php">Create Character </a></h2>
       <h4> Create a character to explore Midvale </h4>
       <h2> <a href="leaderboard.php">Leaderboard </a></h2>
       <h4> See how other players are doing </h4>

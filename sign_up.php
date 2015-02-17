@@ -30,12 +30,12 @@
     <h3 class = "center">Account Creation</h3>
   </div>
   
-  <div>
-    <h2> Sign Up and Start Playing </h2>
-    <p>Enter the following information to create your account.</p>
+ <div class="col-sm-6">
+    <h2> Admin: </h2>
+    <p>Enter the following information to create an account for a user.</p>
     <br />
 
-    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="POST">
+    <form action="process_account.php" method="POST">
       <table>
         <tr>
           <td class ="bold_right" >
@@ -64,12 +64,13 @@
             Email:
           </td>
           <td>
-            <input name="email1"> </input> 
+            <input name="email"> </input> 
           </td>
         </tr>
         <tr>
           <td> <br /></td>
         </tr>
+        <!--
         <tr>
           <td class ="bold_right" >
             Verify Email:
@@ -81,17 +82,30 @@
         <tr>
           <td> <br /></td>
         </tr>
+        -->
         <tr>
           <td class ="bold_right" >
-            Password:
+            Username:
           </td>
           <td>
-            <input name="password1"> </input> 
+            <input name="username"> </input> 
           </td>
         </tr>
         <tr>
           <td> <br /></td>
         </tr>
+        <tr>
+          <td class ="bold_right" >
+            Password:
+          </td>
+          <td>
+            <input name="password"> </input> 
+          </td>
+        </tr>
+        <tr>
+          <td> <br /></td>
+        </tr>
+        <!--
         <tr>
           <td class ="bold_right" >
             Verify Password:
@@ -100,6 +114,7 @@
             <input name="password2"> </input> 
           </td>
         </tr>
+        -->
         <tr>
           <td> <br /></td>
         </tr>
@@ -109,12 +124,24 @@
             <input name="done" type="submit" value="Sign Up"></input>
           </td>
         </tr>
-
       </table>
-
-      
     </form>
   </div>
+
+  <div class="col-sm-5">
+    <h3> List of current user accounts:</h3>
+    <?php
+        $db = loadDatabase();
+        // get users data from database
+        $stmt = $db->query("SELECT username, user_id FROM users ORDER BY username ASC");
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // populate options
+        foreach ($results as $row)
+        {
+          echo $row['username'] . "<br />\n";
+        }
+    ?>
 </div>
 </body>
 </html>
