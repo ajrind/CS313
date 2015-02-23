@@ -1,12 +1,17 @@
-<?php require 'dbConnect.php';
+<?php 
+require 'dbConnect.php';
+require 'password.php';
 
 // get the data from the POST
-$first_name = $_POST['first_name'];
-$last_name = $_POST['last_name'];
-$email = $_POST['email'];
-$username = $_POST['username'];
-$password = $_POST['password'];
+$first_name = htmlspecialchars($_POST['first_name']);
+$last_name = htmlspecialchars($_POST['last_name']);
+$email = htmlspecialchars($_POST['email']);
+$username = htmlspecialchars($_POST['username']);
+$password = htmlspecialchars($_POST['password']);
 $is_admin = false;
+
+
+$hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
 try
 {
@@ -22,7 +27,7 @@ try
 	$statement->bindParam(':first_name', $first_name);
 	$statement->bindParam(':last_name', $last_name);
 	$statement->bindParam(':username', $username);
-	$statement->bindParam(':password', $password);
+	$statement->bindParam(':password', $hashedPassword);
 	$statement->bindParam(':email', $email);
 	$statement->bindParam(':is_admin', $is_admin);
 

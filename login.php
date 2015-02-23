@@ -1,20 +1,87 @@
-<?php require 'dbConnect.php';?>
+<?php 
+require 'dbConnect.php';
+require 'password.php';
+?>
 
 <?php
-  $tries = 0;
-  $cookieName = "loggedIn";
-  $cookieValue = "NULL";
-  $forwardLocation = "midvale_main.php";
 
-  if(isset($_COOKIE[$cookieName]) && $_COOKIE[$cookieName] != "NULL")
+  // make sure the session is active
+$forwardLocation = "midvale_main.php";
+
+session_start();
+
+if (isset($_SESSION['username']))
+{
+  header("Location:$forwardLocation");
+  die(); // we always include a die after redirects.
+}
+
+
+else
+{
+  // left blank intentionally
+}
+
+
+$loginError = false;
+
+if (isset($_POST["username"]) && isset($_POST["password"]))
+{
+  // they have submitted a username and password for us to check
+  $username = $_POST["username"];
+  $password = $_POST["password"];
+
+  try
   {
-    header("Location:$forwardLocation");
+    $db = loadDatabase();
+
+
+    // this line makes PDO give us an exception when there are problems, and can be very helpful in debugging!
+    $db->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+
+    $query = 'SELECT password FROM users WHERE username=:username';
+
+    $statement = $db->prepare($query);
+    $statement->bindParam(':username', $username);
+
+    $result = $statement->execute();
+
+    // if the entry exists, then check the password
+    if ($result)
+    {
+      $row = $statement->fetch();
+      $hashedPasswordFromDB = $row['password'];
+
+      // check password
+      //if (password_verify($password, $hashedPasswordFromDB))
+        if ($password == $hashedPasswordFromDB)
+      {
+        // password was correct, put the user on the session, and redirect to home
+        $_SESSION['username'] = $username;
+        header("Location:$forwardLocation");
+        die(); // we always include a die after redirects.
+      }
+      else
+      {
+        $loginError = true;
+      }
+
+    }
+    else
+    {
+      $loginError = true;
+    }
+  }
+  catch (Exception $ex)
+  {
+    // Please be aware that you don't want to output the Exception message in
+    // a production environment
+    echo "Error with DB. Details: $ex";
+    die();
   }
 
-  else
-  {
-    setcookie($cookieName,$cookieValue);
-  }
+}
+
 
 ?>
 
@@ -29,59 +96,6 @@
   <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 </head>
 <body>
-
-<?php
-
-	  $error = false;
-      $loginError = ""; 
-	  if($_SERVER["REQUEST_METHOD"] == "POST")
-      {
-         // login information
-      	 $username = $_POST["username"]; 
-         $password = $_POST["password"];
-      	 $tries++;
-         // retreive from database
-      	 $db = loadDatabase();
-      	 $request = "SELECT * FROM users WHERE username='" . $username . "' AND password='" . $password ."';";
-
-		 $stmt = $db->query($request);
-
-         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-         $size = count($results);
-         //echo "size = " . $size;
-
-         // successful login
-         if ($size == 1)
-         {
-         	$cookieValue = $_POST["username"];
-         	setcookie($cookieName, $cookieValue);
-     		header("Location:$forwardLocation");
-     		$loginError ="";
-         }
-
-         // unsuccessful login attempt
-         else
-         {
-         	if(empty($_POST["username"]))
-         	{
-         		$loginError = "You must enter a username!";
-         	}
-
-         	else if(empty($_POST["password"]))
-         	{
-         		$loginError = "You must enter a password!";
-         	}
-
-         	else
-         	{
-         		$loginError = "Invalid username / password combination!";
-         		$cookieValue = "NULL";
-         	}
-         }
-	   }
-     ?>
-
   <nav class="collapse navbar-collapse bs-navbar-collapse">
     <ul class="nav navbar-nav">
       <li class="active">
@@ -137,7 +151,10 @@
           <td></td>
           <td>
             <?php 
-            	echo "<h4 style=\"color:red\">" . $loginError . "</h4>";
+            if ($loginError)
+            {
+            	echo "<h4 style=\"color:red\"> Incorrect username / password combination! </h4>";
+            }
           	?>
           </td>
         </tr>

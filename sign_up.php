@@ -1,5 +1,23 @@
 <?php require 'dbConnect.php';?>
 
+<?php
+  // make sure the session is active
+
+  $forwardLocation = "login.php";
+
+session_start();
+
+if (isset($_SESSION['username']))
+{
+  // left blank intentionally
+}
+else
+{
+  header("Location:$forwardLocation");
+  die(); // we always include a die after redirects.
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>

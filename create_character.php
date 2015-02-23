@@ -1,21 +1,21 @@
 <?php require 'dbConnect.php';?>
 
 <?php
+  // make sure the session is active
 
-  $cookieName = "loggedIn";
-  $cookieValue = "NULL";
   $forwardLocation = "login.php";
 
-  // If login worked
-  if(isset($_COOKIE[$cookieName]) && $_COOKIE[$cookieName] != "NULL")
-  {
-    // left blank intentionally
-  }
+session_start();
 
-  else
-  {
-    header("Location:$forwardLocation");
-  }
+if (isset($_SESSION['username']))
+{
+  // left blank intentionally
+}
+else
+{
+  header("Location:$forwardLocation");
+  die(); // we always include a die after redirects.
+}
 ?>
 
 <!DOCTYPE html>
