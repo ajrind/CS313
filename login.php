@@ -53,8 +53,7 @@ if (isset($_POST["username"]) && isset($_POST["password"]))
       $hashedPasswordFromDB = $row['password'];
 
       // check password
-      //if (password_verify($password, $hashedPasswordFromDB))
-        if ($password == $hashedPasswordFromDB)
+      if (password_verify($password, $hashedPasswordFromDB))
       {
         // password was correct, put the user on the session, and redirect to home
         $_SESSION['username'] = $username;
